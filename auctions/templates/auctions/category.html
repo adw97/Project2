@@ -1,0 +1,35 @@
+{% extends "auctions/layout.html" %}
+
+{% block title %}
+{% endblock %}
+
+{% block body %}
+    {% if auction_listings is None %}
+        <div class="alert alert-danger" role="alert">
+            <h4 class="alert-heading">Oops! No Listings found for <strong>{{ not_category }}</strong></h4>
+            <p>Unfortunately, there are no listings for category you searched for</p>
+        </div>
+    {% else %}
+        {% for listing in auction_listings %}
+            <div class="border">
+                <div class="media">
+                    <a href="{% url 'listings' listing.id %}">
+                        <img src= "{{ listing.image }}" alt="{{ listing.title }}" class="mr-3">
+                        <div class="media-body">
+                            <strong>{{ listing.title }}</strong>
+                            <br>
+                            <strong>Price: $
+                                {% if listing.starting_bid > listing.updated_bid %}
+                                    {{ listing.starting_bid }}
+                                {% else %}
+                                    {{ listing.updated_bid }}
+                                {% endif %}
+                            </strong>
+                    </a>
+                            <p>{{ listing.description }}</p>                
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>Active Listings</h2>
+
+    {% for listing in auction_listings %}
+        <div class="border">
+            <div class="media">
+                <a href="{% url 'listings' listing.id %}">
+                    <img src= "{{ listing.image }}" alt="{{ listing.title }}" class="mr-3">
+                    <div class="media-body">
+                        <strong>{{ listing.title }}</strong>
+                        <br>
+                        <strong>Price: $
+                            {% if listing.starting_bid > listing.updated_bid %}
+                                {{ listing.starting_bid }}
+                            {% else %}
+                                {{ listing.updated_bid }}
+                            {% endif %}
+                        </strong>
+                </a>
+                        <p>{{ listing.description }}</p>                
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}

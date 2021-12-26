@@ -1,0 +1,20 @@
+{% extends "auctions/layout.html" %}
+
+{% block title %}
+    Watchlist
+{% endblock %}
+
+{% block body %}
+    <h2>Your Watchlist</h2>
+    {% for watchlist in watchlists %}
+        {% if watchlist.is_watchlisted == True and user == watchlist.user %}
+            <ul>
+                <li>
+                    <a href="{% url 'listings' watchlist.listing_id %}">
+                        <p>{{ watchlist.listing }}</p>
+                    </a>
+                </li>
+            </ul>
+        {% endif %}
+    {% endfor %}
+{% endblock %}

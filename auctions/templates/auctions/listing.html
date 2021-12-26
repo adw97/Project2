@@ -1,0 +1,121 @@
+{% extends "auctions/layout.html" %}
+
+{% block title %}
+    {{ item.title }}
+{% endblock %}
+
+{% block body %}
+    {% if closing %}
+        <div class="alert alert-success" role="alert">
+            <h4 class="alert-heading">Owner has closed biddings!</h4>
+            {% if winner %}
+                <p><strong>{{ winner }}</strong> has won this item with highest bid</p>
+            {% else %}
+                <p>No bids were made. So, there is no winner</p>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    {% if not user and not closing %}
+        <div class="alert alert-warning" role="alert">
+            <p>
+                You are not logged in. <a href="{% url 'login' %}">Log In</a> to make bid
+            </p>
+        </div>
+    {% endif %}
+
+    <h2>Listing: {{ item.title }}</h2>
+
+    {% if user %}
+        <div class="float-right">
+            <ul class="nav">
+                <li class="nav-item">
+                    <form action="{% url 'listings' item.id %}" method="post">
+                        {% csrf_token %}
+                        {% if True in watchlist %}
+                            <button type="submit" name="rm" value="{{ item.title }}" class="btn btn-outline-danger" {% if closing %} disabled {% endif %}>Remove from Watchlist</button>
+                        {% else %}
+                            <button type="submit" name="add" value="{{ item.title }}" class="btn btn-outline-success" {% if closing %} disabled {% endif %}>Add to Watchlist</button>
+                        {% endif %}
+                    </form>
+                </li>
+            </ul>
+        </div>
+                
+        <br><br>
+
+        {% if creator == user and not item.closed %}
+            <div class="float-right">
+                <ul class="nav">
+                    <li class="nav-item">
+                        <form action="{% url 'listings' item.id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" name="close" value="{{ item.title }}" class="btn btn-outline-warning">Close Bid</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        {% endif %}
+    {% endif %}
+
+
+    <img src="{{ item.image }}">
+    <p>{{ item.description }}</p>
+    <strong>
+        Current Price: $
+        {% if item.starting_bid > item.updated_bid %}
+            {{ item.starting_bid }}
+        {% else %}
+            {{ item.updated_bid }}
+        {% endif %}
+    </strong>
+    <br><br>
+    {% if message %}
+        <p class="alert">{{ message }}</p>
+    {% endif %}
+
+    <form action="{% url 'listings' item.id %}" method="post">
+        {% csrf_token %}
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="basic-addon1">$</span>
+            </div>
+            <input class="form-control" type="number" name="bid" placeholder="Make Bid" {% if closing or not user %} disabled {% endif %} id="mbid">
+        </div>
+        <input class="btn btn-primary" type="submit" value="Confirm Bid" {% if closing or not user %} disabled {% endif %}>
+    </form>
+    <br><br>
+
+    <h4>Details</h4>
+    <ul>
+        <li>Created By: {{ creator }}</li>
+        <li>Category: {{ item.category }}</li>
+    </ul>
+
+    {% if message2 %}
+        <p class="alert">{{ message2 }}</p>
+    {% endif %}
+    
+    <form action="" method="post">
+        {% csrf_token %}
+        <textarea name="comment" placeholder="Share your Thoughts" class="form-control" {% if closing or not user %} disabled {% endif %}></textarea>
+        <br>
+        <input type="submit" value="Comment" class="btn btn-primary" {% if closing or not user %} disabled {% endif %}>
+    </form>
+
+    <br>
+
+    <h4>Comments Section</h4>
+    {% for comment in comments %}
+        {% if comment.item_name == item %}
+            <div class="card">
+                <div class="card-header">
+                    <strong>{{ comment.commentor }}</strong>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">{{ comment.comment }}</p>
+                </div>
+            </div>
+        {% endif %}
+    {% endfor %}
+{% endblock %}
